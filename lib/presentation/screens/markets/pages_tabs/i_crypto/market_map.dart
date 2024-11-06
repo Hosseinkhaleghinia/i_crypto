@@ -25,6 +25,7 @@ class _MarketMapWidgetState extends State<MarketMapWidget> {
   OverlayEntry? _overlayEntry;
   Currency? _selectedCrypto;
   Offset? _tapPosition;
+  bool _isInitialLoad = true; // اضافه کردن فلگ برای لود اولیه
 
   @override
   void initState() {
@@ -38,23 +39,37 @@ class _MarketMapWidgetState extends State<MarketMapWidget> {
           ? CurrencyType.irt
           : CurrencyType.tether;
       _removeOverlay();
+      _isInitialLoad = true; // ریست کردن فلگ هنگام تغییر نوع ارز
     });
-  }
-
-  double _parseVolume(String volume) {
-    return double.tryParse(volume.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0.0;
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<CryptoDataProvider>(
       builder: (context, provider, child) {
-        // دریافت داده‌ها بر اساس نوع ارز
         final data = _currencyType == CurrencyType.tether
             ? provider.getTetherList()
             : provider.getIRTList();
 
-        // مرتب‌سازی داده‌ها بر اساس حجم معاملات
+        // فقط در لود اولیه یا زمانی که هیچ دیتایی نداریم loading رو نشون میدیم
+        if (provider.isLoading && _isInitialLoad && data.isEmpty) {
+          return Scaffold(
+            backgroundColor: blue100Safaii,
+            appBar: _buildAppBar(),
+            body: Center(
+              child: SpinKitCircle(
+                size: 70,
+                color: backgrand,
+              ),
+            ),
+          );
+        }
+
+        // بعد از لود اولیه، فلگ رو false میکنیم
+        if (_isInitialLoad) {
+          _isInitialLoad = false;
+        }
+
         final sortedData = List<Currency>.from(data)
           ..sort((a, b) {
             final aVolume = _parseVolume(a.volumeSrc!);
@@ -64,48 +79,8 @@ class _MarketMapWidgetState extends State<MarketMapWidget> {
 
         return Scaffold(
           backgroundColor: blue100Safaii,
-          appBar: AppBar(
-            backgroundColor: blue100Safaii,
-            elevation: 0,
-            title: Text(
-              _currencyType == CurrencyType.tether
-                  ? 'نقشه بازار تتری'
-                  : 'نقشه بازار تومانی',
-              style: TextStyle(fontSize: 16),
-            ),
-            centerTitle: true,
-            actions: [
-              IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Transform.scale(
-                  scaleX: -1,
-                  child: Icon(Icons.arrow_back),
-                ),
-              )
-            ],
-            leading: IconButton(
-                onPressed: _toggleCurrencyType,
-                icon: _currencyType == CurrencyType.tether
-                    ? SvgPicture.asset(
-                  'images/iran.svg',
-                  width: 25,
-                  height: 25,
-                )
-                    : SvgPicture.asset(
-                  'images/usdt.svg',
-                  width: 25,
-                  height: 25,
-                )),
-          ),
-          body: provider.isLoading
-              ? Center(
-              child: SpinKitCircle(
-                size: 70,
-                color: backgrand,
-              ))
-              : Padding(
+          appBar: _buildAppBar(),
+          body: Padding(
             padding: EdgeInsets.all(0),
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -123,12 +98,16 @@ class _MarketMapWidgetState extends State<MarketMapWidget> {
                         top: boxes[i].top,
                         width: boxes[i].width,
                         height: boxes[i].height,
-                        child: Padding(
-                          padding: EdgeInsets.all(widget.padding),
-                          child: _buildBox(
-                            sortedData[i],
-                            boxes[i].height,
-                            _currencyType,
+                        child: AnimatedContainer( // اضافه کردن انیمیشن نرم برای تغییرات
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          child: Padding(
+                            padding: EdgeInsets.all(widget.padding),
+                            child: _buildBox(
+                              sortedData[i],
+                              boxes[i].height,
+                              _currencyType,
+                            ),
                           ),
                         ),
                       ),
@@ -139,6 +118,45 @@ class _MarketMapWidgetState extends State<MarketMapWidget> {
           ),
         );
       },
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      backgroundColor: blue100Safaii,
+      elevation: 0,
+      title: Text(
+        _currencyType == CurrencyType.tether
+            ? 'نقشه بازار تتری'
+            : 'نقشه بازار تومانی',
+        style: TextStyle(fontSize: 16),
+      ),
+      centerTitle: true,
+      actions: [
+        IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Transform.scale(
+            scaleX: -1,
+            child: Icon(Icons.arrow_back),
+          ),
+        )
+      ],
+      leading: IconButton(
+        onPressed: _toggleCurrencyType,
+        icon: _currencyType == CurrencyType.tether
+            ? SvgPicture.asset(
+          'images/iran.svg',
+          width: 25,
+          height: 25,
+        )
+            : SvgPicture.asset(
+          'images/usdt.svg',
+          width: 25,
+          height: 25,
+        ),
+      ),
     );
   }
 
@@ -162,7 +180,9 @@ class _MarketMapWidgetState extends State<MarketMapWidget> {
       _tapPosition = null;
     });
   }
-
+  double _parseVolume(String volume) {
+    return double.tryParse(volume.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0.0;
+  }
   void _showDetailsOverlay(Currency crypto, Offset tapPosition, Size boxSize) {
     // اگر crypto جدید با crypto قبلی یکسان است، overlay را حذف کن
     if (_selectedCrypto?.symbol == crypto.symbol) {
@@ -313,7 +333,7 @@ class _MarketMapWidgetState extends State<MarketMapWidget> {
             );
             String displayText = '';
 
-            if (constraints.maxWidth > 200) {
+            if (constraints.maxWidth > 300) {
               displayText =
               '${data.symbol!}\n$pricePrefix${data.latestPrice}$priceSuffix\n${safeDayChange}';
             } else if (constraints.maxWidth > 150) {

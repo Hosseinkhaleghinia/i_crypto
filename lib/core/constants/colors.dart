@@ -20,10 +20,10 @@ const backgrand = Color(0xffDEE4D5);
 
 
 const green20Market = Color(0xffA8E6A3);
-const green50Market = Color(0xff4CAF50);
-const green100Market = Color(0xff087F23);
+const green50Market = Color(0xff127852);
+const green100Market = Color(0xff00573F);
 const red20Market = Color(0xffFFCDD2);
-const red50Market = Color(0xffE57373);
-const red100Market = Color(0xffB71C1C);
-const greyMarket = Color(0xffB0BEC5);
+const red50Market = Color(0xffC40233);
+const red100Market = Color(0xffA7002D);
+const greyMarket = Color(0xffBDBABB);
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:icrypto/data/models/currency.dart';
+import 'package:icrypto/presentation/widgets/images/crypto_image_widget.dart';
 
 class CryptoListItem extends StatelessWidget {
   final double width;
@@ -52,23 +53,10 @@ class CryptoListItem extends StatelessWidget {
   }
 
   Widget _buildCryptoAvatar() {
-    return CircleAvatar(
-      backgroundColor: Colors.transparent,
+    return CryptoImage(
+      imageUrl: crypto.iconUrl!,
       radius: AVATAR_RADIUS,
-      child: CachedNetworkImage(
-        imageUrl: crypto.iconUrl!,
-        placeholder: (context, url) => _buildAvatarPlaceholder(),
-        errorWidget: (context, url, error) => _buildAvatarPlaceholder(),
-        imageBuilder: (context, imageProvider) => Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            image: DecorationImage(
-              image: imageProvider,
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-      ),
+      fallbackColor: hexToColor(crypto.color!),
     );
   }
 
