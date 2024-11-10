@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:icrypto/core/constants/colors.dart';
+import 'package:icrypto/presentation/screens/markets/pages_tabs/global/global_page.dart';
 import 'package:icrypto/presentation/screens/markets/pages_tabs/i_crypto/i_crypto_list.dart';
-
 
 class MainMarkets extends StatefulWidget {
   const MainMarkets({super.key});
@@ -62,7 +62,7 @@ class _MainMarketsState extends State<MainMarkets>
                   isDense: true,
                   // کمک می‌کند متن عمودی وسط قرار بگیرد
                   alignLabelWithHint:
-                  true, // کمک می‌کند hint عمودی وسط قرار بگیرد
+                      true, // کمک می‌کند hint عمودی وسط قرار بگیرد
                 ),
               ),
             ),
@@ -73,8 +73,10 @@ class _MainMarketsState extends State<MainMarkets>
                 labelStyle: const TextStyle(fontWeight: FontWeight.bold),
                 labelColor: redSafaii,
                 unselectedLabelColor: Colors.black87,
-                indicator: BoxDecoration(border: Border.all(style: BorderStyle.none)),
-                padding: EdgeInsets.zero, // اضافه کردن این خط
+                indicator:
+                    BoxDecoration(border: Border.all(style: BorderStyle.none)),
+                padding: EdgeInsets.zero,
+                // اضافه کردن این خط
                 tabs: const [
                   Tab(text: 'جهانی'),
                   Tab(text: 'نوبیتکس'),
@@ -87,20 +89,12 @@ class _MainMarketsState extends State<MainMarkets>
               thickness: 1.0,
               height: 1,
             ),
-
             Expanded(
               child: TabBarView(
-
                 controller: _tabController,
                 children: [
-                  Container(
-                    color: Colors.red,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 0),
-                    child: const CryptoList(),
-                  ),
+                  GlobalList(),
+                  CryptoList(),
                   Container(
                     color: Colors.blue,
                   ),
@@ -110,7 +104,6 @@ class _MainMarketsState extends State<MainMarkets>
           ],
         ),
         bottomNavigationBar: Container(
-
           color: backgrand,
           height: 70,
           child: Row(
@@ -120,7 +113,7 @@ class _MainMarketsState extends State<MainMarkets>
                   onPressed: () {},
                   icon: SvgPicture.asset(
                     'images/menu.svg',
-                  ) ),
+                  )),
               IconButton(
                   onPressed: () {},
                   icon: SvgPicture.asset(

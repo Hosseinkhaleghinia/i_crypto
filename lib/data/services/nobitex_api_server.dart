@@ -25,6 +25,22 @@ class NobitexApiServer{
     return state;
   }
 
+  Future<dynamic> getGlobalStats() async {
+    var dio = Dio();
+    var response = await dio.request(
+      '${baseUrl}market/global-stats',
+      options: Options(
+        method: 'POST',
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      throw Exception('Failed to fetch global stats: ${response.statusMessage}');
+    }
+  }
+
   Future<dynamic> getProfile() async{
     var headers = {
       'Authorization': 'Token $token'

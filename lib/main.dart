@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:icrypto/data/services/cache_service.dart';
 import 'package:icrypto/presentation/providers/crypto_data_provider.dart';
+import 'package:icrypto/presentation/providers/kraken_data_provider.dart';
 import 'package:icrypto/presentation/screens/markets/main_markets.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,9 +14,8 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (_) => CryptoDataProvider(cacheService),
-        ),
+        ChangeNotifierProvider(create: (_) => CryptoDataProvider(cacheService)),
+        //ChangeNotifierProvider(create: (_) => KrakenDataProvider()),
       ],
       child:  Application(),
     ),
@@ -28,7 +28,7 @@ class Application extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'vazir'),
-      home: const MainMarkets(),
+    home: MainMarkets(),
     );
   }
 }

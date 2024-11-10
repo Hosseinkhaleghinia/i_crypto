@@ -154,6 +154,11 @@ class _CryptoListState extends State<CryptoList>
     );
   }
 
+  Future<void> _refreshData() async {
+    final provider = Provider.of<CryptoDataProvider>(context, listen: false);
+    await provider.fetchCoins();
+  }
+
   Widget _buildTabContent(double width, bool isTether) {
     return Consumer<CryptoDataProvider>(
       builder: (context, provider, child) {
@@ -171,25 +176,31 @@ class _CryptoListState extends State<CryptoList>
                 return const Center(child: Text('داده‌ای موجود نیست'));
               }
 
-              return Column(
-                children: [
-                  CryptoFilters(
-                    filterButtons: _filterButtons,
-                    onFilterTap: (button) => _handleFilterTap(button, provider),
-                    width: width,
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: cryptos.length,
-                      itemBuilder: (context, index) {
-                        return CryptoListItem(
-                          width: width,
-                          crypto: cryptos[index],
-                        );
-                      },
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Column(
+                  children: [
+                    CryptoFilters(
+                      filterButtons: _filterButtons,
+                      onFilterTap: (button) => _handleFilterTap(button, provider),
+                      width: width,
                     ),
-                  ),
-                ],
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: _refreshData,
+                        child: ListView.builder(
+                          itemCount: cryptos.length,
+                          itemBuilder: (context, index) {
+                            return CryptoListItem(
+                              width: width,
+                              crypto: cryptos[index],
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               );
             }
 
